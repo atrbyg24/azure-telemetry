@@ -6,19 +6,6 @@ from pathlib import Path
 from queries import fetch_fleet_demand, fetch_latency_outliers, fetch_memory_audit
 
 st.set_page_config(page_title="Azure 2019 Telemetry Explorer", layout="wide")
-@st.cache_resource
-def get_connection():
-    base_path = Path(__file__).parent.parent.absolute()
-    db_path = base_path / "data" / "processed" / "telemetry.db"
-    
-    if not db_path.exists():
-        db_path = base_path / "telemetry.db"
-        
-    if not db_path.exists():
-        st.error(f"Database not found! Tried: {db_path}")
-        st.stop()
-        
-    return sqlite3.connect(str(db_path), check_same_thread=False)
 
 
 def main():

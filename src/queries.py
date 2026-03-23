@@ -1,6 +1,21 @@
 import streamlit as st
 import pandas as pd
+from pathlib import Path
+import sqlite3
 
+@st.cache_resource
+def get_connection():
+    base_path = Path(__file__).parent.parent.absolute()
+    db_path = base_path / "data" / "processed" / "telemetry.db"
+    
+    if not db_path.exists():
+        db_path = base_path / "telemetry.db"
+        
+    if not db_path.exists():
+        st.error(f"Database not found! Tried: {db_path}")
+        st.stop()
+        
+    return sqlite3.connect(str(db_path), check_same_thread=False)
 @st.cache_data
 def fetch_fleet_demand(day_str: str):
     query = f'SELECT * FROM "invocations_per_function_md.anon.d{day_str}" LIMIT 10'
