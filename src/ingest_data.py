@@ -3,8 +3,9 @@ import pandas as pd
 import glob
 import os
 
-DB_PATH = os.path.join('..', 'data', 'processed', 'telemetry.db')
-RAW_DATA_PATH = os.path.join('..', 'data', 'raw', 'azurefunctions-dataset2019', '*.csv')
+SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(SRC_DIR, '..', 'data', 'processed', 'telemetry.db')
+RAW_DATA_PATH = os.path.join(SRC_DIR, '..', 'data', 'raw', 'azurefunctions-dataset2019', '*.csv')
 
 def ingest_telemetry():
     """

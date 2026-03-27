@@ -2,16 +2,14 @@ import sqlite3
 import pandas as pd
 import os
 
-DB_PATH = os.path.join('..', 'data', 'processed', 'telemetry.db')
-OUT_PATH = os.path.join('..', 'data', 'processed', 'invocations_combined.parquet')
+SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(SRC_DIR, '..', 'data', 'processed', 'telemetry.db')
+OUT_PATH = os.path.join(SRC_DIR, '..', 'data', 'processed', 'invocations_combined.parquet')
 
 def combine_invocations():    
-    if not DB_PATH.exists():
-        print(f"Database not found at {DB_PATH}")
-        return
-                
     print(f"Connecting to database at {DB_PATH}")
-    conn = sqlite3.connect(str(DB_PATH))
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
     
     sparse_chunks = []
     
@@ -41,7 +39,7 @@ def combine_invocations():
         melted_df = melted_df[melted_df['invocations'] > 0].copy()
         
         # Convert to global_minutes
-        melted_df['global_minute'] = melted_df['minute_of_day'].astype(int) + (day * 1440)
+        melted_df['global_minute'] = melted_df['minute_of_day'].astype(int) + ((day - 1) * 1440)
         melted_df = melted_df.drop(columns=['minute_of_day'])
         
         sparse_chunks.append(melted_df)
@@ -49,8 +47,8 @@ def combine_invocations():
     print("Combining all days and saving to Parquet...")
     if sparse_chunks:
         final_df = pd.concat(sparse_chunks, ignore_index=True)
-        final_df.to_parquet(out_path, index=False)
-        print(f"Done! Saved sparse dataset with {len(final_df)} rows to {out_path}")
+        final_df.to_parquet(OUT_PATH, index=False)
+        print(f"Done! Saved sparse dataset with {len(final_df)} rows to {OUT_PATH}")
     else:
         print("No data found.")
         
