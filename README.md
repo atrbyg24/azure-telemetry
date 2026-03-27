@@ -1,13 +1,12 @@
 # Azure 2019 Telemetry Explorer
 
-A Streamlit dashboard built to visualize and explore the Azure Functions Dataset (2019). The application provides an interactive deep-dive into the serverless workloads characteristics, highlighting fleet demand, tail latency outliers, and resource efficiency.
-
 ## Overview
 
-This repository contains the data processing pipeline and the frontend exploring the telemetry data. It focuses on:
+This repository contains the data processing pipeline, a machine learning model for invocation prediction, and a frontend for exploring the telemetry data. It focuses on:
 - **Fleet Demand**: Visualizing the invocations per function over time.
 - **Latency Analytics**: Spotting the high-latency outliers (p99 metrics) across applications.
 - **Memory Efficiency**: Auditing memory allocations dynamically.
+- **Invocation Prediction**: LightGBM binary classifier to predict whether a function will be invoked in the future.
 
 ## Quick Start
 
@@ -23,15 +22,38 @@ This repository contains the data processing pipeline and the frontend exploring
    ```bash
    pip install -r requirements.txt
    ```
+   > **macOS note:** LightGBM requires OpenMP. Install it via Homebrew if you see a `libomp.dylib` error:
+   > ```bash
+   > brew install libomp
+   > ```
 4. Run the dashboard:
    ```bash
    streamlit run src/app.py
    ```
 
+### Data Pipeline
+
+Run the following scripts in order from the project root:
+
+```bash
+# 1. Ingest raw CSVs into SQLite
+python src/ingest_data.py
+
+# 2. Combine invocation tables into a sparse Parquet file
+python src/combine_invocations.py
+
+# 3. Train the invocation prediction model
+python src/train_invocation_model.py
+```
+
 ### Project Structure
 - `src/app.py` - The main Streamlit dashboard layout.
 - `src/queries.py` - SQL queries targeting the SQLite database, cached for performance.
-- `src/ingest_data.py` - Logic used to process the raw Azure telemetry dataset into a clean DB.
+- `src/ingest_data.py` - Ingests raw Azure telemetry CSVs into a SQLite database.
+- `src/combine_invocations.py` - Merges per-day invocation tables into a single sparse Parquet file.
+- `src/train_invocation_model.py` - Trains a LightGBM model to predict future function invocations.
+- `data/processed/` - Generated database and Parquet files (git-ignored).
+- `models/` - Saved LightGBM model file (git-ignored).
 
 ## Data Source
 

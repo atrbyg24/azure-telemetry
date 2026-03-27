@@ -35,7 +35,7 @@ def combine_invocations():
             value_name='invocations'
         )
         
-        # Filter out zero invocations to save massive amounts of memory memory
+        # Filter out zero invocations to save massive amounts of memory
         melted_df = melted_df[melted_df['invocations'] > 0].copy()
         
         # Convert to global_minutes

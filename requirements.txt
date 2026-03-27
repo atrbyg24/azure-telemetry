@@ -3,3 +3,5 @@ matplotlib
 streamlit
 plotly
 pyarrow
+lightgbm
+scikit-learn
