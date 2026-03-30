@@ -5,3 +5,6 @@ plotly
 pyarrow
 lightgbm
 scikit-learn
+fastapi
+uvicorn
+pydantic

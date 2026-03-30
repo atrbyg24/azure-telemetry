@@ -127,7 +127,7 @@ def read_and_aggregate(parquet_path: str):
                 .groupby('hashfunction', sort=False)
                 .agg(
                     total_invocations  = ('invocations',  'sum'),
-                    active_minutes     = ('invocations',  'count'),   # sparse → count == unique minutes
+                    active_minutes     = ('invocations',  'count'),   
                     recent_invocations = ('recent_inv',   'sum'),
                     early_invocations  = ('early_inv',    'sum'),
                 )
@@ -170,8 +170,6 @@ def read_and_aggregate(parquet_path: str):
     days_active = all_pairs.groupby('hashfunction').size().rename('days_active')
 
     return sum_df, max_ser, days_active, target
-
-
 
 
 def build_feature_matrix(sum_df, max_ser, days_active, target):
@@ -270,23 +268,15 @@ def train_lightgbm_incremental(X, y):
     return model
 
 
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-
 def main():
     os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
 
-    # --- Feature aggregation (chunked parquet read) ---
     sum_df, max_ser, days_active, target = read_and_aggregate(PARQUET_PATH)
 
-    # --- Feature matrix ---
     X, y = build_feature_matrix(sum_df, max_ser, days_active, target)
 
-    # --- Incremental LightGBM training ---
     model = train_lightgbm_incremental(X, y)
 
-    # --- Save ---
     model.save_model(MODEL_PATH)
     print(f"\nModel saved → {MODEL_PATH}")
 
