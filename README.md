@@ -30,6 +30,10 @@ This repository contains the data processing pipeline, a machine learning model 
    ```bash
    streamlit run src/app.py
    ```
+5. Run the prediction API:
+   ```bash
+   uvicorn src.api:app --reload
+   ```
 
 ### Data Pipeline
 
@@ -48,6 +52,7 @@ python src/train_invocation_model.py
 
 ### Project Structure
 - `src/app.py` - The main Streamlit dashboard layout.
+- `src/api.py` - FastAPI application serving the LightGBM prediction model.
 - `src/queries.py` - SQL queries targeting the SQLite database, cached for performance.
 - `src/ingest_data.py` - Ingests raw Azure telemetry CSVs into a SQLite database.
 - `src/combine_invocations.py` - Merges per-day invocation tables into a single sparse Parquet file.
